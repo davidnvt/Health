@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Health Master 🩺</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'Segoe UI', 'Nunito', Tahoma, sans-serif;
+    min-height: 100vh;
+    display: flex; justify-content: center; align-items: center;
+    padding: 16px; overflow-x: hidden; position: relative;
+    background: linear-gradient(-45deg, #0b3d3b, #0e5c56, #10847c, #0d4f5c, #0a3838);
+    background-size: 400% 400%;
+    animation: bgShift 18s ease infinite;
+  }
+  @keyframes bgShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+
+  .particles { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+  .particle {
+    position: absolute; border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.6), rgba(74,222,128,.25));
+    box-shadow: 0 0 12px rgba(74,222,128,.4);
+    animation: floatUp linear infinite;
+  }
+  @keyframes floatUp {
+    from { transform: translateY(105vh) scale(.3); opacity: 0; }
+    10% { opacity: .9; } 90% { opacity: .9; }
+    to { transform: translateY(-10vh) scale(1.4); opacity: 0; }
+  }
+
+  .app {
+    position: relative; z-index: 1;
+    background: rgba(255,255,255,.97);
+    backdrop-filter: blur(20px);
+    width: 100%; max-width: 720px;
+    max-height: 96vh; overflow-y: auto;
+    border-radius: 28px;
+    box-shadow: 0 30px 70px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.15) inset;
+    padding: 28px 26px;
+    animation: appIn .6s cubic-bezier(.34,1.56,.64,1);
+    scrollbar-width: thin;
+  }
+  .app::-webkit-scrollbar { width: 6px; }
+  .app::-webkit-scrollbar-thumb { background: #34d399; border-radius: 10px; }
+  @keyframes appIn { from { opacity: 0; transform: scale(.9) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+
+  .screen { display: none; }
+  .screen.active { display: block; animation: screenIn .45s cubic-bezier(.34,1.3,.64,1); }
+  @keyframes screenIn { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+
+  .logo {
+    font-size: 66px; text-align: center; margin-bottom: 6px;
+    filter: drop-shadow(0 8px 20px rgba(16,185,129,.5));
+    animation: heartbeat 1.4s ease-in-out infinite;
+  }
+  @keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    15% { transform: scale(1.15); }
+    30% { transform: scale(1); }
+    45% { transform: scale(1.1); }
+  }
+
+  h1 {
+    text-align: center; font-size: 30px; font-weight: 900;
+    background: linear-gradient(135deg, #059669, #10b981, #34d399);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text; letter-spacing: -.5px; margin-bottom: 4px;
+  }
+  .subtitle { text-align: center; color: #666; font-size: 13.5px; margin-bottom: 20px; font-weight: 500; }
+  .subtitle .count { color: #059669; font-weight: 800; }
+
+  .mode-title { text-align: center; font-size: 11.5px; font-weight: 800; color: #999; letter-spacing: 2px; margin-bottom: 12px; }
+  .modes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
+  .mode {
+    padding: 14px 10px; border: 2.5px solid #d1fae5; border-radius: 16px;
+    background: #f0fdf4; cursor: pointer; transition: all .25s; text-align: center;
+  }
+  .mode:hover { transform: translateY(-3px); border-color: #6ee7b7; box-shadow: 0 10px 25px rgba(16,185,129,.2); }
+  .mode.selected {
+    background: linear-gradient(135deg, #10b981, #059669);
+    border-color: transparent; color: #fff;
+    box-shadow: 0 12px 30px rgba(16,185,129,.5);
+  }
+  .mode .icon { font-size: 24px; display: block; margin-bottom: 4px; }
+  .mode .name { font-weight: 800; font-size: 13.5px; }
+  .mode .desc { font-size: 10.5px; opacity: .7; margin-top: 2px; }
+
+  .rules {
+    background: linear-gradient(135deg, #f0fdf4, #ecfeff);
+    border-left: 4px solid #10b981; border-radius: 14px;
+    padding: 14px 16px; margin-bottom: 18px;
+    font-size: 13px; color: #444; line-height: 1.9;
+  }
+  .rules b { color: #047857; }
+
+  .btn {
+    display: block; width: 100%; padding: 15px; border: none;
+    border-radius: 16px; font-size: 16px; font-weight: 800; cursor: pointer;
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: #fff; letter-spacing: .5px;
+    transition: transform .15s, box-shadow .15s;
+    box-shadow: 0 10px 26px rgba(16,185,129,.45);
+    font-family: inherit; position: relative; overflow: hidden;
+  }
+  .btn::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, transparent, rgba(255,255,255,.4), transparent);
+    transform: translateX(-100%); transition: transform .6s;
+  }
+  .btn:hover::before { transform: translateX(100%); }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 14px 34px rgba(16,185,129,.6); }
+  .btn:active { transform: translateY(0); }
+  .btn.secondary {
+    background: #fff; color: #059669; border: 2.5px solid #10b981;
+    box-shadow: none; margin-top: 10px;
+  }
+
+  .hud { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .hud-item {
+    display: flex; align-items: center; gap: 6px; color: #047857;
+    background: #f0fdf4; padding: 8px 14px; border-radius: 12px;
+    font-size: 13px; font-weight: 800;
+  }
+  .hearts { font-size: 15px; letter-spacing: 3px; padding: 8px 12px; background: #fff0f0; }
+  .heart { transition: all .3s; }
+  .heart.lost { filter: grayscale(1); opacity: .3; transform: scale(.85); }
+
+  .progress-info {
+    display: flex; justify-content: space-between;
+    font-size: 11px; font-weight: 700; color: #999;
+    letter-spacing: 1px; margin-bottom: 6px;
+  }
+
+  .timer-bar { height: 10px; background: #d1fae5; border-radius: 20px; overflow: hidden; margin-bottom: 18px; }
+  .timer-fill {
+    height: 100%; width: 100%; border-radius: 20px;
+    background: linear-gradient(90deg, #34d399, #10b981);
+    transition: width 1s linear, background .3s; position: relative;
+  }
+  .timer-fill.warn { background: linear-gradient(90deg, #fbbf24, #f59e0b); }
+  .timer-fill.danger { background: linear-gradient(90deg, #f43f5e, #ef4444); animation: pulse .6s infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .55; } }
+
+  .cat-row { text-align: center; margin-bottom: 10px; }
+  .category {
+    display: inline-block; padding: 4px 12px; border-radius: 20px;
+    font-size: 10.5px; font-weight: 800; letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .cat-vocab { background: #d1fae5; color: #065f46; }
+  .cat-def { background: #cffafe; color: #155e75; }
+  .cat-fill { background: #fef3c7; color: #92400e; }
+  .cat-trans { background: #fce7f3; color: #9d174d; }
+  .cat-phrase { background: #ede9fe; color: #5b21b6; }
+
+  .question {
+    font-size: 22px; font-weight: 800; color: #064e3b;
+    text-align: center; line-height: 1.6;
+    margin-bottom: 18px; padding: 18px 22px;
+    background: linear-gradient(135deg, #f0fdf4, #ecfeff);
+    border: 1.5px solid #d1fae5; border-radius: 18px;
+    overflow-wrap: break-word;
+    word-break: normal;
+    hyphens: none;
+    box-shadow: 0 4px 14px rgba(16,185,129,.08);
+    min-height: 78px;
+    display: flex; align-items: center; justify-content: center;
+    flex-wrap: wrap; gap: 2px;
+  }
+  .question.len-md { font-size: 19px; padding: 16px 18px; }
+  .question.len-lg { font-size: 17px; padding: 14px 16px; }
+  .question.len-xl { font-size: 15.5px; padding: 12px 14px; }
+  .question.len-xxl { font-size: 14px; padding: 10px 12px; }
+
+  .question .word {
+    display: inline-block;
+    white-space: nowrap;
+  }
+
+  .blank {
+    color: #059669;
+    display: inline-block;
+    padding: 0 10px; margin: 0 2px;
+    background: rgba(16,185,129,.15);
+    border-radius: 8px; font-weight: 900;
+    position: relative; min-width: 42px; text-align: center;
+    white-space: nowrap;
+  }
+  .blank::after {
+    content: ''; position: absolute;
+    left: 6px; right: 6px; bottom: 3px;
+    height: 2.5px;
+    background: linear-gradient(90deg, #34d399, #059669);
+    border-radius: 3px;
+    animation: blankPulse 1.5s ease-in-out infinite;
+  }
+  @keyframes blankPulse { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
+
+  .options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .option {
+    padding: 15px 10px 15px 42px;
+    border: 2.5px solid #d1fae5; border-radius: 15px;
+    background: #f0fdf4;
+    font-size: 17px; font-weight: 800; color: #047857;
+    cursor: pointer; transition: all .18s;
+    text-align: left; font-family: inherit; position: relative;
+    overflow-wrap: break-word; word-break: normal;
+  }
+  .option .key {
+    position: absolute; left: 12px; top: 50%;
+    transform: translateY(-50%);
+    width: 24px; height: 24px;
+    display: flex; align-items: center; justify-content: center;
+    background: #d1fae5; color: #059669;
+    border-radius: 8px; font-size: 12px; font-weight: 900;
+    transition: all .18s;
+  }
+  .option:hover:not(:disabled) {
+    border-color: #6ee7b7; background: #dcfce7;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(16,185,129,.2);
+  }
+  .option:hover:not(:disabled) .key { background: #059669; color: #fff; }
+  .option:disabled { cursor: default; }
+  .option.correct {
+    background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+    border-color: #10b981; color: #065f46;
+    animation: pop .5s cubic-bezier(.34,1.56,.64,1);
+    box-shadow: 0 0 0 4px rgba(16,185,129,.2);
+  }
+  .option.correct .key { background: #10b981; color: #fff; }
+  .option.wrong {
+    background: linear-gradient(135deg, #ffe4e6, #fecdd3);
+    border-color: #f43f5e; color: #9f1239;
+    animation: shake .45s ease;
+  }
+  .option.wrong .key { background: #f43f5e; color: #fff; }
+  .option.reveal {
+    background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+    border-color: #10b981; color: #065f46;
+    animation: pop .5s cubic-bezier(.34,1.56,.64,1);
+  }
+  .option.reveal .key { background: #10b981; color: #fff; }
+  @keyframes pop { 0% { transform: scale(1); } 40% { transform: scale(1.06); } 100% { transform: scale(1); } }
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    20% { transform: translateX(-10px); }
+    40% { transform: translateX(10px); }
+    60% { transform: translateX(-6px); }
+    80% { transform: translateX(6px); }
+  }
+
+  .feedback {
+    text-align: center; font-weight: 800; font-size: 15px;
+    margin-top: 14px; min-height: 22px; color: #555;
+  }
+  .feedback.ok { color: #059669; animation: slideUp .4s; }
+  .feedback.no { color: #e11d48; animation: slideUp .4s; }
+  @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  .explain {
+    font-size: 13.5px; color: #555; text-align: center;
+    margin-top: 8px; min-height: 18px; padding: 6px 12px;
+    background: #f0fdf4; border-radius: 10px;
+    display: none; line-height: 1.5;
+    overflow-wrap: break-word;
+  }
+  .explain.show { display: block; animation: slideUp .4s; }
+  .explain .ipa {
+    color: #059669; font-weight: 800;
+    font-family: 'Lucida Sans Unicode', 'Segoe UI', sans-serif;
+    background: rgba(16,185,129,.1);
+    padding: 1px 6px; border-radius: 6px;
+    display: inline-block; margin: 0 3px;
+    white-space: nowrap;
+  }
+
+  /* Đồng hồ đếm ngược 30s xem lại đáp án */
+  .review-countdown {
+    display: none;
+    text-align: center;
+    margin-top: 10px;
+    font-size: 13px;
+    font-weight: 800;
+    color: #b45309;
+    background: #fffbeb;
+    border: 1.5px dashed #fcd34d;
+    border-radius: 12px;
+    padding: 8px 12px;
+    animation: slideUp .4s;
+  }
+  .review-countdown.show { display: block; }
+  .review-countdown b { color: #dc2626; font-size: 16px; }
+  .review-countdown .skip-btn {
+    display: inline-block;
+    margin-left: 10px;
+    padding: 4px 12px;
+    background: #059669;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-weight: 800;
+    font-size: 12px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .review-countdown .skip-btn:hover { background: #047857; }
+
+  .combo-pop {
+    position: fixed; top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    font-size: 52px; font-weight: 900;
+    background: linear-gradient(135deg, #34d399, #10b981, #fbbf24);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 4px 20px rgba(16,185,129,.5);
+    pointer-events: none; opacity: 0; z-index: 9999;
+  }
+  .combo-pop.show { animation: comboAnim 1.3s cubic-bezier(.34,1.56,.64,1) forwards; }
+  @keyframes comboAnim {
+    0% { opacity: 0; transform: translate(-50%,-30%) scale(.3) rotate(-15deg); }
+    35% { opacity: 1; transform: translate(-50%,-50%) scale(1.3) rotate(0); }
+    60% { transform: translate(-50%,-50%) scale(1.1) rotate(0); }
+    100% { opacity: 0; transform: translate(-50%,-90%) scale(1) rotate(5deg); }
+  }
+
+  .result-emoji {
+    font-size: 78px; text-align: center; margin-bottom: 10px;
+    animation: bounce 1.2s infinite;
+    filter: drop-shadow(0 12px 24px rgba(0,0,0,.2));
+  }
+  @keyframes bounce { 0%,100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-14px) scale(1.05); } }
+  .result-title {
+    text-align: center; font-size: 24px; font-weight: 900;
+    background: linear-gradient(135deg, #059669, #10b981);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text; margin-bottom: 8px;
+  }
+  .rank {
+    text-align: center; font-size: 14px; font-weight: 800;
+    color: #d97706; margin-bottom: 18px;
+    padding: 8px 16px; background: #fffbeb;
+    border-radius: 20px; display: block;
+  }
+
+  .stars { text-align: center; font-size: 30px; letter-spacing: 6px; margin-bottom: 14px; }
+  .stars .star { display: inline-block; animation: starPop .5s backwards; }
+  .stars .star:nth-child(1) { animation-delay: .2s; }
+  .stars .star:nth-child(2) { animation-delay: .4s; }
+  .stars .star:nth-child(3) { animation-delay: .6s; }
+  @keyframes starPop {
+    0% { opacity: 0; transform: scale(0) rotate(-180deg); }
+    70% { transform: scale(1.3) rotate(15deg); }
+    100% { opacity: 1; transform: scale(1) rotate(0); }
+  }
+
+  .chart-wrap { display: flex; justify-content: center; margin: 6px 0 20px; }
+  .donut { width: 150px; height: 150px; position: relative; }
+  .donut svg { transform: rotate(-90deg); }
+  .donut .donut-text {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; font-weight: 900;
+  }
+  .donut .donut-num { font-size: 32px; color: #047857; line-height: 1; }
+  .donut .donut-lbl { font-size: 10px; color: #999; letter-spacing: 1.5px; margin-top: 4px; }
+
+  .stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 18px; }
+  .stat {
+    background: linear-gradient(135deg, #f0fdf4, #ecfeff);
+    border-radius: 16px; padding: 14px 8px; text-align: center;
+    border: 1px solid #d1fae5; transition: transform .2s;
+  }
+  .stat:hover { transform: translateY(-3px); }
+  .stat .num { font-size: 22px; font-weight: 900; color: #059669; line-height: 1.1; }
+  .stat .lbl { font-size: 10px; color: #888; font-weight: 800; letter-spacing: 1px; margin-top: 6px; }
+
+  .confetti {
+    position: fixed; top: -20px; z-index: 9999; pointer-events: none;
+    animation: fall linear forwards;
+  }
+  @keyframes fall {
+    to { transform: translateY(105vh) rotate(900deg); opacity: 0; }
+  }
+
+  @media (max-width: 520px) {
+    .app { padding: 22px 16px; border-radius: 22px; }
+    h1 { font-size: 24px; }
+    .question { font-size: 18px; padding: 14px 14px; min-height: 66px; }
+    .question.len-md { font-size: 16.5px; padding: 12px 12px; }
+    .question.len-lg { font-size: 15px; padding: 10px 10px; }
+    .question.len-xl { font-size: 14px; padding: 10px 10px; }
+    .question.len-xxl { font-size: 13px; padding: 9px 9px; }
+    .blank { padding: 0 8px; min-width: 36px; }
+    .option { font-size: 15px; padding: 13px 8px 13px 38px; }
+    .option .key { left: 10px; width: 22px; height: 22px; font-size: 11px; }
+    .modes { grid-template-columns: 1fr; }
+    .logo { font-size: 48px; }
+    .result-emoji { font-size: 62px; }
+    .donut { width: 130px; height: 130px; }
+    .combo-pop { font-size: 38px; }
+    .stat .num { font-size: 18px; }
+    .explain { font-size: 12.5px; }
+    .review-countdown { font-size: 12px; padding: 7px 10px; }
+    .review-countdown .skip-btn { font-size: 11px; padding: 3px 9px; margin-left: 6px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="particles" id="particles"></div>
+
+<div class="app">
+
+  <div id="startScreen" class="screen active">
+    <div class="logo">🩺</div>
+    <h1>Health Master</h1>
+    <p class="subtitle">Chinh phục từ vựng sức khỏe · <span class="count">40 câu hỏi</span></p>
+
+    <div class="mode-title">CHỌN CHẾ ĐỘ CHƠI</div>
+    <div class="modes" id="modes">
+      <div class="mode selected" data-mode="all">
+        <span class="icon">🎲</span>
+        <div class="name">Tất cả</div>
+        <div class="desc">Trộn 40 câu</div>
+      </div>
+      <div class="mode" data-mode="def">
+        <span class="icon">📖</span>
+        <div class="name">Định nghĩa</div>
+        <div class="desc">10 câu</div>
+      </div>
+      <div class="mode" data-mode="fill">
+        <span class="icon">✏️</span>
+        <div class="name">Điền từ</div>
+        <div class="desc">10 câu</div>
+      </div>
+      <div class="mode" data-mode="vocab">
+        <span class="icon">💊</span>
+        <div class="name">Từ vựng</div>
+        <div class="desc">10 câu</div>
+      </div>
+      <div class="mode" data-mode="phrase">
+        <span class="icon">🧩</span>
+        <div class="name">Cụm từ</div>
+        <div class="desc">10 câu</div>
+      </div>
+    </div>
+
+    <div class="rules">
+      ⏱️ <b>20 giây</b> cho mỗi câu<br>
+      ❤️ Bạn có <b>3 mạng</b> — sai hoặc hết giờ mất 1 mạng<br>
+      🔥 Chuỗi đúng ≥ 3 câu → nhận <b>điểm combo</b><br>
+      🩺 Khi trả lời sai, có <b>30 giây</b> xem lại đáp án đúng<br>
+      🏆 Cuối game nhận <b>xếp hạng Bác sĩ</b> theo kết quả
+    </div>
+
+    <button class="btn" onclick="startGame()">▶ BẮT ĐẦU CHƠI</button>
+  </div>
+
+  <div id="gameScreen" class="screen">
+    <div class="hud">
+      <div class="hud-item">⭐ <span id="score">0</span></div>
+      <div class="hud-item hearts" id="hearts">❤️❤️❤️</div>
+    </div>
+
+    <div class="progress-info">
+      <span id="qCounter">CÂU 1 / 40</span>
+      <span id="streakInfo">🔥 x0</span>
+    </div>
+    <div class="timer-bar"><div class="timer-fill" id="timerFill"></div></div>
+
+    <div class="cat-row"><span class="category" id="category">DEFINITION</span></div>
+    <div class="question" id="question">Đang tải...</div>
+    <div class="options" id="options"></div>
+    <div class="feedback" id="feedback"></div>
+    <div class="explain" id="explain"></div>
+    <div class="review-countdown" id="reviewCountdown"></div>
+  </div>
+
+  <div id="resultScreen" class="screen">
+    <div class="result-emoji" id="resultEmoji">🩺</div>
+    <div class="result-title" id="resultTitle">Hoàn thành!</div>
+    <div class="rank" id="rankText"></div>
+
+    <div class="stars" id="stars"></div>
+
+    <div class="chart-wrap">
+      <div class="donut">
+        <svg width="150" height="150" viewBox="0 0 160 160">
+          <circle cx="80" cy="80" r="65" fill="none" stroke="#d1fae5" stroke-width="14"/>
+          <circle id="donutFill" cx="80" cy="80" r="65" fill="none"
+                  stroke="url(#grad)" stroke-width="14" stroke-linecap="round"
+                  stroke-dasharray="408" stroke-dashoffset="408"
+                  style="transition: stroke-dashoffset 1.2s ease .3s;"/>
+          <defs>
+            <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#10b981"/>
+              <stop offset="100%" stop-color="#34d399"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <div class="donut-text">
+          <div class="donut-num" id="donutPct">0%</div>
+          <div class="donut-lbl">CHÍNH XÁC</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><div class="num" id="rScore">0</div><div class="lbl">ĐIỂM</div></div>
+      <div class="stat"><div class="num" id="rCorrect">0</div><div class="lbl">CÂU ĐÚNG</div></div>
+      <div class="stat"><div class="num" id="rStreak">0</div><div class="lbl">CHUỖI MAX</div></div>
+    </div>
+
+    <button class="btn" onclick="startGame()">🔁 CHƠI LẠI</button>
+    <button class="btn secondary" onclick="backHome()">🏠 VỀ TRANG CHỦ</button>
+  </div>
+
+</div>
+
+<div class="combo-pop" id="comboPop"></div>
+
+<script>
+/* ============================================================
+   NGÂN HÀNG CÂU HỎI — 40 CÂU CHỦ ĐỀ HEALTH (có IPA)
+   ============================================================ */
+const QUESTIONS = [
+
+  /* ============ DEFINITION — Exercise 1 (10 câu) ============ */
+  { cat: "def", q: "A condition in which a person has too much body fat.",
+    opts: ["Infection","Obesity","Treatment","Symptom"], ans: 1,
+    ex: 'Obesity <span class="ipa">/əʊˈbiːsəti/</span> = bệnh béo phì.' },
+  { cat: "def", q: "A medical condition in which the body cannot control blood sugar properly.",
+    opts: ["Diabetes","Stress","Obesity","Infection"], ans: 0,
+    ex: 'Diabetes <span class="ipa">/ˌdaɪəˈbiːtiːz/</span> = bệnh tiểu đường.' },
+  { cat: "def", q: "To experience an illness, pain or difficulty.",
+    opts: ["Prevent","Recover","Suffer from","Breathe"], ans: 2,
+    ex: 'Suffer from <span class="ipa">/ˈsʌfə frəm/</span> = mắc, chịu đựng (bệnh).' },
+  { cat: "def", q: "The organs in your chest that you use to breathe.",
+    opts: ["Symptoms","Lungs","Immune systems","Diseases"], ans: 1,
+    ex: 'Lungs <span class="ipa">/lʌŋz/</span> = phổi.' },
+  { cat: "def", q: "A medical method used to improve someone's health or cure an illness.",
+    opts: ["Treatment","Infection","Diet","Stress"], ans: 0,
+    ex: 'Treatment <span class="ipa">/ˈtriːtmənt/</span> = phương pháp điều trị.' },
+  { cat: "def", q: "The body's system that helps protect it against disease.",
+    opts: ["Healthcare","Physical activity","Immune system","Balanced diet"], ans: 2,
+    ex: 'Immune system <span class="ipa">/ɪˈmjuːn ˌsɪstəm/</span> = hệ miễn dịch.' },
+  { cat: "def", q: "A sign that indicates someone may have an illness.",
+    opts: ["Symptom","Disease","Treatment","Healthcare"], ans: 0,
+    ex: 'Symptom <span class="ipa">/ˈsɪmptəm/</span> = triệu chứng.' },
+  { cat: "def", q: "To stop something bad from happening.",
+    opts: ["Recover","Prevent","Suffer","Breathe"], ans: 1,
+    ex: 'Prevent <span class="ipa">/prɪˈvent/</span> = ngăn ngừa.' },
+  { cat: "def", q: "Containing a lot of nutrients that the body needs.",
+    opts: ["Sedentary","Allergic","Nutritious","Obese"], ans: 2,
+    ex: 'Nutritious <span class="ipa">/njuˈtrɪʃəs/</span> = giàu dinh dưỡng.' },
+  { cat: "def", q: "Involving little physical activity, usually for long periods.",
+    opts: ["Healthy","Sedentary","Balanced","Diabetic"], ans: 1,
+    ex: 'Sedentary <span class="ipa">/ˈsedəntri/</span> = ít vận động.' },
+
+  /* ============ FILL IN — Exercise 2 (10 câu) ============ */
+  { cat: "fill", q: "Eating too much fast food and doing little exercise can lead to ______.",
+    opts: ["infection","obesity","treatment","healthcare"], ans: 1,
+    ex: 'Obesity <span class="ipa">/əʊˈbiːsəti/</span> = béo phì.' },
+  { cat: "fill", q: "My brother is ______ to peanuts, so he must avoid eating them.",
+    opts: ["nutritious","sedentary","allergic","diabetic"], ans: 2,
+    ex: 'Allergic <span class="ipa">/əˈlɜːdʒɪk/</span> = dị ứng.' },
+  { cat: "fill", q: "Many office workers ______ back pain because they sit for long periods.",
+    opts: ["suffer from","lead to","recover from","prevent"], ans: 0,
+    ex: 'Suffer from <span class="ipa">/ˈsʌfə frəm/</span> = mắc, chịu đựng.' },
+  { cat: "fill", q: "It is important to ______ regularly to maintain good health.",
+    opts: ["disease","symptom","breathe","exercise"], ans: 3,
+    ex: 'Exercise <span class="ipa">/ˈeksəsaɪz/</span> = tập thể dục.' },
+  { cat: "fill", q: "A lack of exercise and an unhealthy diet can ______ serious health problems.",
+    opts: ["recover from","lead to","suffer from","prevent from"], ans: 1,
+    ex: 'Lead to <span class="ipa">/liːd tuː/</span> = dẫn đến.' },
+  { cat: "fill", q: "The doctor recommended an effective ______ for the patient's illness.",
+    opts: ["treatment","infection","lung","obesity"], ans: 0,
+    ex: 'Treatment <span class="ipa">/ˈtriːtmənt/</span> = phương pháp điều trị.' },
+  { cat: "fill", q: "Eating fruit and vegetables can help strengthen your ______.",
+    opts: ["symptom","immune system","infection","stress"], ans: 1,
+    ex: 'Immune system <span class="ipa">/ɪˈmjuːn ˌsɪstəm/</span> = hệ miễn dịch.' },
+  { cat: "fill", q: "A fever and a sore throat can be ______ of an infection.",
+    opts: ["treatments","diseases","symptoms","lungs"], ans: 2,
+    ex: 'Symptoms <span class="ipa">/ˈsɪmptəmz/</span> = triệu chứng.' },
+  { cat: "fill", q: "People should do regular ______ instead of sitting in front of a screen all day.",
+    opts: ["physical activity","healthcare","infection","obesity"], ans: 0,
+    ex: 'Physical activity <span class="ipa">/ˌfɪzɪkl ækˈtɪvəti/</span> = hoạt động thể chất.' },
+  { cat: "fill", q: "After several weeks of rest, she began to ______ her illness.",
+    opts: ["prevent","recover from","suffer from","lead to"], ans: 1,
+    ex: 'Recover from <span class="ipa">/rɪˈkʌvə frəm/</span> = hồi phục sau.' },
+
+  /* ============ VOCABULARY (10 câu) ============ */
+  { cat: "vocab", q: 'Từ nào có nghĩa là "sức khỏe"?',
+    opts: ["healthy","health","unhealthy","healthcare"], ans: 1,
+    ex: 'Health <span class="ipa">/helθ/</span> (n) = sức khỏe.' },
+  { cat: "vocab", q: 'Từ nào có nghĩa là "chế độ ăn cân bằng"?',
+    opts: ["balanced diet","physical activity","immune system","treatment"], ans: 0,
+    ex: 'Balanced diet <span class="ipa">/ˌbælənst ˈdaɪət/</span>.' },
+  { cat: "vocab", q: '"Béo phì" trong tiếng Anh là gì?',
+    opts: ["diabetic","obese","allergic","sedentary"], ans: 1,
+    ex: 'Obese <span class="ipa">/əʊˈbiːs/</span> (adj) = béo phì.' },
+  { cat: "vocab", q: 'Từ nào có nghĩa là "hệ miễn dịch"?',
+    opts: ["immune system","infection","lung","symptom"], ans: 0,
+    ex: 'Immune system <span class="ipa">/ɪˈmjuːn ˌsɪstəm/</span>.' },
+  { cat: "vocab", q: '"Triệu chứng" trong tiếng Anh là gì?',
+    opts: ["treatment","disease","symptom","infection"], ans: 2,
+    ex: 'Symptom <span class="ipa">/ˈsɪmptəm/</span>.' },
+  { cat: "vocab", q: 'Từ nào có nghĩa là "hồi phục sau"?',
+    opts: ["prevent","recover from","suffer from","lead to"], ans: 1,
+    ex: 'Recover from <span class="ipa">/rɪˈkʌvə frəm/</span>.' },
+  { cat: "vocab", q: '"Dị ứng với" trong tiếng Anh là gì?',
+    opts: ["nutritious","allergic to","sedentary","diabetic"], ans: 1,
+    ex: 'Allergic to <span class="ipa">/əˈlɜːdʒɪk tuː/</span>.' },
+  { cat: "vocab", q: 'Từ nào có nghĩa là "ngăn ngừa"?',
+    opts: ["prevent","recover","suffer","breathe"], ans: 0,
+    ex: 'Prevent <span class="ipa">/prɪˈvent/</span>.' },
+  { cat: "vocab", q: '"Ít vận động" trong tiếng Anh là gì?',
+    opts: ["healthy","sedentary","balanced","nutritious"], ans: 1,
+    ex: 'Sedentary <span class="ipa">/ˈsedəntri/</span>.' },
+  { cat: "vocab", q: 'Từ nào có nghĩa là "dịch vụ chăm sóc sức khỏe"?',
+    opts: ["health","healthy","healthcare","unhealthy"], ans: 2,
+    ex: 'Healthcare <span class="ipa">/ˈhelθkeə/</span>.' },
+
+  /* ============ PHRASAL / COLLOCATIONS (10 câu) ============ */
+  { cat: "phrase", q: "If you eat too much fast food and never exercise, you will ______.",
+    opts: ["lose weight","gain weight","cut down on","work out"], ans: 1,
+    ex: 'Gain weight <span class="ipa">/ɡeɪn weɪt/</span> = tăng cân.' },
+  { cat: "phrase", q: "The doctor advised him to ______ sugar and fatty foods.",
+    opts: ["put on","cut down on","come down with","take up"], ans: 1,
+    ex: 'Cut down on <span class="ipa">/kʌt daʊn ɒn/</span> = cắt giảm, hạn chế.' },
+  { cat: "phrase", q: "She has been on a diet because she wants to ______ before her wedding.",
+    opts: ["lose weight","gain weight","put on weight","come down with"], ans: 0,
+    ex: 'Lose weight <span class="ipa">/luːz weɪt/</span> = giảm cân.' },
+  { cat: "phrase", q: "I try to ______ at the gym three times a week to keep fit.",
+    opts: ["eat out","work out","give up","get over"], ans: 1,
+    ex: 'Work out <span class="ipa">/wɜːk aʊt/</span> = tập thể dục, tập luyện.' },
+  { cat: "phrase", q: "You should ______ smoking to protect your lungs.",
+    opts: ["take up","give up","put on","look after"], ans: 1,
+    ex: 'Give up <span class="ipa">/ɡɪv ʌp/</span> = từ bỏ.' },
+  { cat: "phrase", q: "He ______ a bad cold after walking home in the heavy rain.",
+    opts: ["got over","cut down on","came down with","worked out"], ans: 2,
+    ex: 'Come down with <span class="ipa">/kʌm daʊn wɪð/</span> = mắc phải (bệnh).' },
+  { cat: "phrase", q: "It took her almost a week to ______ the flu.",
+    opts: ["come down with","get over","put on","take up"], ans: 1,
+    ex: 'Get over <span class="ipa">/ɡet ˈəʊvə/</span> = vượt qua, khỏi (bệnh).' },
+  { cat: "phrase", q: "She practises yoga every morning to ______.",
+    opts: ["gain weight","stay in shape","come down with","eat out"], ans: 1,
+    ex: 'Stay in shape <span class="ipa">/steɪ ɪn ʃeɪp/</span> = giữ dáng, giữ sức khỏe.' },
+  { cat: "phrase", q: "He decided to ______ jogging to improve his health.",
+    opts: ["give up","get over","take up","cut down on"], ans: 2,
+    ex: 'Take up <span class="ipa">/teɪk ʌp/</span> = bắt đầu (một môn, thói quen).' },
+  { cat: "phrase", q: "Running is a great way to ______ and stay healthy.",
+    opts: ["burn calories","gain weight","put on weight","come down with"], ans: 0,
+    ex: 'Burn calories <span class="ipa">/bɜːn ˈkæləriz/</span> = đốt cháy calo.' }
+];
+
+/* ============================================================
+   CATEGORY INFO
+   ============================================================ */
+const CAT_INFO = {
+  def:    { label: "DEFINITION", cls: "cat-def" },
+  fill:   { label: "FILL IN",    cls: "cat-fill" },
+  vocab:  { label: "VOCABULARY", cls: "cat-vocab" },
+  phrase: { label: "PHRASAL",    cls: "cat-phrase" }
+};
+
+/* ============================================================
+   STATE
+   ============================================================ */
+let pool = [];
+let idx = 0, score = 0, lives = 3, correctCount = 0;
+let streak = 0, maxStreak = 0;
+let timeLeft = 20, timerId = null, locked = false;
+let mode = "all";
+const TOTAL_Q = 40;             // Tổng số câu cho chế độ "Tất cả"
+
+/* Thời gian chờ giữa các câu (ms) */
+const DELAY_CORRECT = 1600;     // đúng → qua nhanh
+const DELAY_WRONG   = 30000;    // sai / hết giờ → 30 giây xem lại
+
+const $ = id => document.getElementById(id);
+
+/* Biến đếm ngược 30s xem lại */
+let reviewIntervalId = null;
+
+/* ============================================================
+   AUDIO
+   ============================================================ */
+let audioCtx = null;
+function beep(freq, dur, type = 'sine', vol = .12) {
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.type = type; o.frequency.value = freq;
+    o.connect(g); g.connect(audioCtx.destination);
+    g.gain.setValueAtTime(vol, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(.001, audioCtx.currentTime + dur);
+    o.start(); o.stop(audioCtx.currentTime + dur);
+  } catch(e) {}
+}
+const sndCorrect = () => { beep(660,.1); setTimeout(()=>beep(880,.13),90); };
+const sndWrong   = () => { beep(180,.25,'sawtooth',.1); };
+const sndTick    = () => { beep(1100,.04,'square',.04); };
+const sndWin     = () => { [523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,.2),i*130)); };
+const sndLose    = () => { [400,300,200].forEach((f,i)=>setTimeout(()=>beep(f,.3,'sawtooth',.1),i*180)); };
+
+/* ============================================================
+   NAV
+   ============================================================ */
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  $(id).classList.add('active');
+}
+function backHome() {
+  clearInterval(reviewIntervalId);
+  show('startScreen');
+}
+
+document.querySelectorAll('.mode').forEach(m => {
+  m.addEventListener('click', () => {
+    document.querySelectorAll('.mode').forEach(x => x.classList.remove('selected'));
+    m.classList.add('selected');
+    mode = m.dataset.mode;
+    beep(500, .06, 'sine', .06);
+  });
+});
+
+/* ============================================================
+   START
+   ============================================================ */
+function startGame() {
+  clearInterval(reviewIntervalId);
+  let filtered;
+  if (mode === 'all') {
+    filtered = [...QUESTIONS];
+  } else {
+    filtered = QUESTIONS.filter(q => q.cat === mode);
+  }
+
+  filtered = shuffle([...filtered]);
+  pool = filtered.slice(0, Math.min(TOTAL_Q, filtered.length));
+
+  idx = 0; score = 0; lives = 3; correctCount = 0;
+  streak = 0; maxStreak = 0;
+  $('score').textContent = 0;
+  $('streakInfo').textContent = '🔥 x0';
+  renderHearts();
+  show('gameScreen');
+  loadQuestion();
+}
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function renderHearts() {
+  let html = '';
+  for (let i = 0; i < 3; i++) html += `<span class="heart ${i < lives ? '' : 'lost'}">❤️</span>`;
+  $('hearts').innerHTML = html;
+}
+
+/* ============================================================
+   LOAD QUESTION
+   ============================================================ */
+function loadQuestion() {
+  locked = false;
+  clearInterval(reviewIntervalId);
+  const q = pool[idx];
+
+  const cat = CAT_INFO[q.cat] || CAT_INFO.vocab;
+  $('category').textContent = cat.label;
+  $('category').className = 'category ' + cat.cls;
+
+  $('qCounter').textContent = `CÂU ${idx + 1} / ${pool.length}`;
+  $('streakInfo').textContent = `🔥 x${streak}`;
+
+  const len = q.q.length;
+  const qEl = $('question');
+  qEl.className = 'question';
+  if (len > 95)      qEl.classList.add('len-xxl');
+  else if (len > 75) qEl.classList.add('len-xl');
+  else if (len > 60) qEl.classList.add('len-lg');
+  else if (len > 45) qEl.classList.add('len-md');
+
+  const words = q.q.split(/(\s+)/);
+  const html = words.map(w => {
+    if (/^\s+$/.test(w)) return w;
+    if (w.includes('___')) {
+      return `<span class="word">${w.replace(/______|___/g, '<span class="blank">___</span>')}</span>`;
+    }
+    return `<span class="word">${w}</span>`;
+  }).join('');
+  qEl.innerHTML = html;
+
+  $('feedback').textContent = '';
+  $('feedback').className = 'feedback';
+  $('explain').innerHTML = '';
+  $('explain').className = 'explain';
+  $('reviewCountdown').className = 'review-countdown';
+  $('reviewCountdown').innerHTML = '';
+
+  const box = $('options');
+  box.innerHTML = '';
+  const keys = ['A','B','C','D'];
+  q.opts.forEach((opt, i) => {
+    const b = document.createElement('button');
+    b.className = 'option';
+    b.innerHTML = `<span class="key">${keys[i]}</span>${opt}`;
+    b.onclick = () => choose(i, b);
+    box.appendChild(b);
+  });
+
+  timeLeft = 20;
+  updateTimerBar();
+  clearInterval(timerId);
+  timerId = setInterval(() => {
+    timeLeft--;
+    updateTimerBar();
+    if (timeLeft <= 5 && timeLeft > 0) sndTick();
+    if (timeLeft <= 0) { clearInterval(timerId); timeOut(); }
+  }, 1000);
+}
+
+function updateTimerBar() {
+  const pct = (timeLeft / 20) * 100;
+  const bar = $('timerFill');
+  bar.style.width = pct + '%';
+  bar.className = 'timer-fill';
+  if (pct <= 30) bar.classList.add('danger');
+  else if (pct <= 60) bar.classList.add('warn');
+}
+
+/* ============================================================
+   BẮT ĐẦU ĐẾM NGƯỢC 30s XEM LẠI ĐÁP ÁN (chỉ khi sai / hết giờ)
+   ============================================================ */
+function startReviewCountdown() {
+  const totalSec = Math.round(DELAY_WRONG / 1000);
+  let remaining = totalSec;
+  const el = $('reviewCountdown');
+  el.innerHTML = `⏳ Tự động chuyển sau <b>${remaining}</b> giây · ` +
+                 `<button class="skip-btn" id="skipBtn">Bỏ qua ➡</button>`;
+  el.classList.add('show');
+  $('skipBtn').onclick = () => {
+    clearInterval(reviewIntervalId);
+    clearInterval(timerId);
+    next();
+  };
+
+  clearInterval(reviewIntervalId);
+  reviewIntervalId = setInterval(() => {
+    remaining--;
+    if (remaining <= 0) {
+      clearInterval(reviewIntervalId);
+      el.classList.remove('show');
+      return;
+    }
+    el.innerHTML = `⏳ Tự động chuyển sau <b>${remaining}</b> giây · ` +
+                   `<button class="skip-btn" id="skipBtn">Bỏ qua ➡</button>`;
+    $('skipBtn').onclick = () => {
+      clearInterval(reviewIntervalId);
+      clearInterval(timerId);
+      next();
+    };
+  }, 1000);
+}
+
+/* ============================================================
+   CHOOSE
+   ============================================================ */
+function choose(i, btn) {
+  if (locked) return;
+  locked = true;
+  clearInterval(timerId);
+
+  const q = pool[idx];
+  const buttons = document.querySelectorAll('.option');
+  buttons.forEach(b => b.disabled = true);
+
+  const isCorrect = (i === q.ans);
+
+  if (isCorrect) {
+    btn.classList.add('correct');
+    streak++;
+    maxStreak = Math.max(maxStreak, streak);
+    correctCount++;
+    let gain = 10 + (streak >= 3 ? streak * 2 : 0);
+    score += gain;
+    $('score').textContent = score;
+    $('streakInfo').textContent = `🔥 x${streak}`;
+    sndCorrect();
+    $('feedback').textContent = `✅ Chính xác! +${gain} điểm`;
+    $('feedback').className = 'feedback ok';
+    $('explain').innerHTML = q.ex;
+    $('explain').className = 'explain show';
+    if (streak >= 3) showCombo(streak);
+    spawnConfetti(16);
+    setTimeout(next, DELAY_CORRECT);
+  } else {
+    btn.classList.add('wrong');
+    buttons[q.ans].classList.add('reveal');
+    lives--;
+    streak = 0;
+    $('streakInfo').textContent = '🔥 x0';
+    renderHearts();
+    sndWrong();
+    $('feedback').textContent = `❌ Sai rồi! Đáp án đúng: "${q.opts[q.ans]}"`;
+    $('feedback').className = 'feedback no';
+    $('explain').innerHTML = q.ex;
+    $('explain').className = 'explain show';
+    startReviewCountdown();
+    setTimeout(next, DELAY_WRONG);
+  }
+}
+
+function timeOut() {
+  if (locked) return;
+  locked = true;
+  const q = pool[idx];
+  const buttons = document.querySelectorAll('.option');
+  buttons.forEach(b => b.disabled = true);
+  buttons[q.ans].classList.add('reveal');
+  lives--;
+  streak = 0;
+  $('streakInfo').textContent = '🔥 x0';
+  renderHearts();
+  sndWrong();
+  $('feedback').textContent = `⏰ Hết giờ! Đáp án đúng: "${q.opts[q.ans]}"`;
+  $('feedback').className = 'feedback no';
+  $('explain').innerHTML = q.ex;
+  $('explain').className = 'explain show';
+  startReviewCountdown();
+  setTimeout(next, DELAY_WRONG);
+}
+
+/* ============================================================
+   NEXT / END
+   ============================================================ */
+function next() {
+  clearInterval(reviewIntervalId);
+  clearInterval(timerId);
+  if (lives <= 0) { endGame(false); return; }
+  idx++;
+  if (idx >= pool.length) { endGame(true); return; }
+  loadQuestion();
+}
+
+function endGame(completed) {
+  clearInterval(timerId);
+  clearInterval(reviewIntervalId);
+  show('resultScreen');
+
+  const pct = correctCount / pool.length;
+  let emoji, title, rank, starCount;
+
+  if (!completed || pct < 0.3) {
+    emoji = '🤒'; title = 'Cần nghỉ ngơi và học thêm!';
+    rank = '🥉 Hạng Thực tập sinh – Intern'; starCount = 1;
+    sndLose();
+  } else if (pct < 0.55) {
+    emoji = '🙂'; title = 'Khá tốt!';
+    rank = '🥈 Hạng Y tá – Nurse'; starCount = 1;
+    sndWin();
+  } else if (pct < 0.75) {
+    emoji = '😎'; title = 'Giỏi lắm!';
+    rank = '🥇 Hạng Bác sĩ – Doctor'; starCount = 2;
+    sndWin();
+  } else if (pct < 0.95) {
+    emoji = '🌟'; title = 'Xuất sắc!';
+    rank = '💎 Hạng Chuyên gia – Specialist'; starCount = 3;
+    sndWin();
+  } else {
+    emoji = '👑'; title = 'Hoàn hảo!';
+    rank = '👑 Health Master!'; starCount = 3;
+    sndWin();
+  }
+
+  $('resultEmoji').textContent = emoji;
+  $('resultTitle').textContent = title;
+  $('rankText').textContent = rank;
+
+  let starsHtml = '';
+  for (let i = 0; i < 3; i++) starsHtml += `<span class="star">${i < starCount ? '⭐' : '☆'}</span>`;
+  $('stars').innerHTML = starsHtml;
+
+  const pctInt = Math.round(pct * 100);
+  $('donutPct').textContent = pctInt + '%';
+  setTimeout(() => { $('donutFill').style.strokeDashoffset = 408 * (1 - pct); }, 200);
+
+  $('rScore').textContent = score;
+  $('rCorrect').textContent = `${correctCount}/${pool.length}`;
+  $('rStreak').textContent = maxStreak;
+
+  if (pct >= 0.5) { spawnConfetti(100); setTimeout(() => spawnConfetti(60), 400); }
+}
+
+/* ============================================================
+   COMBO
+   ============================================================ */
+function showCombo(n) {
+  const el = $('comboPop');
+  el.textContent = `🔥 x${n} COMBO!`;
+  el.classList.remove('show');
+  void el.offsetWidth;
+  el.classList.add('show');
+}
+
+/* ============================================================
+   CONFETTI
+   ============================================================ */
+function spawnConfetti(count) {
+  const colors = ['#10b981','#34d399','#6ee7b7','#fbbf24','#f472b6','#38bdf8','#a78bfa','#facc15'];
+  for (let i = 0; i < count; i++) {
+    const c = document.createElement('div');
+    c.className = 'confetti';
+    c.style.left = Math.random() * 100 + 'vw';
+    c.style.background = colors[Math.floor(Math.random() * colors.length)];
+    const size = 6 + Math.random() * 8;
+    c.style.width = size + 'px'; c.style.height = size + 'px';
+    c.style.borderRadius = Math.random() > .5 ? '50%' : '2px';
+    c.style.animationDuration = (1.8 + Math.random() * 1.6) + 's';
+    c.style.animationDelay = (Math.random() * .5) + 's';
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 4000);
+  }
+}
+
+/* ============================================================
+   PARTICLES
+   ============================================================ */
+(function initParticles() {
+  const box = $('particles');
+  for (let i = 0; i < 30; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const size = 4 + Math.random() * 12;
+    p.style.width = size + 'px'; p.style.height = size + 'px';
+    p.style.left = Math.random() * 100 + 'vw';
+    p.style.animationDuration = (12 + Math.random() * 18) + 's';
+    p.style.animationDelay = (-Math.random() * 20) + 's';
+    p.style.opacity = .25 + Math.random() * .5;
+    box.appendChild(p);
+  }
+})();
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && $('startScreen').classList.contains('active')) startGame();
+});
+</script>
+</body>
+</html>
